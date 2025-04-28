@@ -2,7 +2,7 @@
 URL configuration for api project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.1/topics/http/urls/
+    https://docs.djangoproject.com/en/5.2/topics/http/urls/
 Examples:
 Function views
     1. Add an import:  from my_app import views
@@ -17,12 +17,8 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework_simplejwt import views as jwt_views
-
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('', include('authentication.urls')),
-    path('token/', jwt_views.TokenObtainPairView.as_view(), name = 'token_obtain_pair'),
-    path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name = 'token_refresh')
+    path("", include('blog.urls'))
 ]

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blogs</title>
+</head>
+<body>
+    
+    <h1>Blog posts</h1>
+    <hr><hr>
+
+
+    {% for blog in blogs %}
+       
+       
+        <h2>
+            <a href="">{{blog.title}}</a>
+        </h2>
+        <p>
+            Published {{ blog.publish }} by {{ blog.author.username }}
+        </p>
+        {{ blog.body|truncatewords:30|linebreaks }}
+        <hr>
+       
+        
+    {% endfor %}
+    
+</body>
+</html>
