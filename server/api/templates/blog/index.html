@@ -15,7 +15,7 @@
        
        
         <h2>
-            <a href="{% url 'blog_detail' id=blog.id %}">{{blog.title}}</a>
+            <a href="{{ blog.get_absolute_url }}">{{blog.title}}</a>
         </h2>
         <p>
             Published {{ blog.publish }} by {{ blog.author.username }}
@@ -25,6 +25,8 @@
        
         
     {% endfor %}
+
+    {% include 'blog/pagination.html' with page=page_obj %}
     
 </body>
 </html>
