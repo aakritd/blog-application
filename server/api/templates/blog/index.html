@@ -15,14 +15,28 @@
        
        
         <h2>
-            <a href="{{ blog.get_absolute_url }}">{{blog.title}}</a>
+            <a href="{{ blog.blog.get_absolute_url }}">{{blog.blog.title}}</a>
         </h2>
+
+        <h4>
+            Tags:
+            {% for tag in blog.tags %}
+                {{ tag.tag_name }}
+            {% endfor %}
+        </h4>
+        
+            
+        
+
         <p>
-            Published {{ blog.publish }} by {{ blog.author.username }}
+            Published {{ blog.blog.publish }} by {{ blog.blog.author.username }}
         </p>
-        {{ blog.body|truncatewords:30|linebreaks }}
+
+    
+
+        {{ blog.blog.body|truncatewords:30|linebreaks }}
         <hr>
-       
+        
         
     {% endfor %}
 

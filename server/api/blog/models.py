@@ -3,6 +3,14 @@ from django.conf import settings
 from django.utils import timezone
 from django.urls import reverse
 # Create your models here.
+
+
+class Tags(models.Model):
+    tag_name = models.CharField(max_length = 20, unique=True)
+
+    def __str__(self):
+        return self.tag_name
+    
 class Post(models.Model):
     class Status(models.TextChoices):
         DRAFT = 'DF','Draft'
@@ -16,6 +24,9 @@ class Post(models.Model):
     publish = models.DateTimeField(default = timezone.now)
     created = models.DateTimeField(auto_now_add = True)
     updated = models.DateTimeField(auto_now = True)
+    tags = models.ManyToManyField(Tags)
+
+
 
 
     def __str__(self):

@@ -7,6 +7,14 @@
 </head>
 <body>
     <h1>{{blog.title}}</h1>
+    <h5>
+        Tags : 
+        {% for tag in tags %}
+            
+                {{tag.tag_name}}
+            
+        {%  endfor %}
+    </h5>
     <p>
         {{blog.body|linebreaks}}
     </p>
@@ -27,5 +35,13 @@
         
 
     </p>
+
+    {% for recommendation in recommendations %}
+        <a href="{{ recommendation.get_absolute_url }}">
+            {{ recommendation.title }}
+        </a>
+    {% endfor %}
+
+
 </body>
 </html>

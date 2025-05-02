@@ -8,23 +8,56 @@ from django.core.mail import send_mail
 
 class PostListView(ListView):
 
-    queryset = Post.objects.filter(status = 'PB')
-    context_object_name = 'blogs'
+    model = Post
+    
     paginate_by = 3
     template_name = 'blog/index.html'
 
+    def get_context_data(self, **kwargs):
+        # call the best implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        context['blog'] = Post.objects.filter(status = 'PB').order_by('-publish')
+        print(context['blog'][0].id)
+        context_list = []
+        for blog in context['blog']:
+            temp_dict = {}
+            temp_dict['blog'] = blog
+            temp_dict['tags'] = blog.tags.values('tag_name')
+            context_list.append(temp_dict)
+
+        context['blogs'] = context_list
+        
+        return context
 
 def blog_detail(request, slug, year, month, day):
-    post = Post.objects.get(slug = slug, publish__year = year, publish__month = month, publish__day = day)
-    print(post)
-    comments = Comments.objects.filter(post = post)
-    print(comments)
-    blog = Post.objects.get(slug = slug, publish__year = year, publish__month = month, publish__day = day)
-    print('blog : ',blog)
     
+    blog = Post.objects.get(slug = slug, publish__year = year, publish__month = month, publish__day = day)
+    comments = Comments.objects.filter(post = blog)
+    tags = blog.tags.values('tag_name')
+   
+    # recommendations
+
+    post_to_recommend = []
+    for tag in tags:
+        print(tag['tag_name'])
+        tag_to_search = Tags.objects.get(tag_name = tag['tag_name'])
+        
+        recommended_post = Post.objects.filter(tags = tag_to_search)
+
+        post_to_recommend += list(recommended_post)     
+       
+
+
+    
+    post_to_recommend = [post for post in post_to_recommend if post.id != blog.id]
+    
+    print(post_to_recommend)
     content = {
         'blog':blog,
-        'comments':comments
+        'comments':comments,
+        'tags' : tags,
+        'recommendations' : post_to_recommend
     }#values() return list of dictionary.
 
     return render(request, 'blog/blog.html', content)    
