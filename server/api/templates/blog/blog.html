@@ -36,11 +36,28 @@
 
     </p>
 
+    <h4>
+        Related Posts:
+    </h4>
     {% for recommendation in recommendations %}
         <a href="{{ recommendation.get_absolute_url }}">
             {{ recommendation.title }}
         </a>
     {% endfor %}
+
+    <h4>
+        Latest Posts:
+    </h4>
+    
+    {% for latest_blog in latest_blogs %}
+        <p>
+            <a href="{{ latest_blog.get_absolute_url }}">
+                {{ latest_blog.title }}
+            </a>
+        </p>
+    {% endfor %}
+    
+    
 
 
 </body>

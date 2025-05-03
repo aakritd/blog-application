@@ -1,34 +1,42 @@
 from django.shortcuts import render, redirect
 from .models import *
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator #(FOR CBV, you dont need it)
 # Create your views here.
-from django.views.generic import ListView
-from .forms import EmailPostForm, CommentForm
+from django.views.generic import View
+from .forms import EmailPostForm, CommentForm, BlogSearch
 from django.core.mail import send_mail
 
-class PostListView(ListView):
+class PostListView(View):
 
-    model = Post
-    
-    paginate_by = 3
-    template_name = 'blog/index.html'
+    def get(self, request):
+        
+        blogs = Post.objects.filter(status='PB').order_by('-publish')
 
-    def get_context_data(self, **kwargs):
-        # call the best implementation first to get a context
-        context = super().get_context_data(**kwargs)
-        # Add in a QuerySet of all the books
-        context['blog'] = Post.objects.filter(status = 'PB').order_by('-publish')
-        print(context['blog'][0].id)
+        paginator = Paginator(blogs, 3)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+
         context_list = []
-        for blog in context['blog']:
+        for blog in page_obj:
             temp_dict = {}
             temp_dict['blog'] = blog
-            temp_dict['tags'] = blog.tags.values('tag_name')
+            temp_dict['tag'] = blog.tags.values('tag_name')
             context_list.append(temp_dict)
-
-        context['blogs'] = context_list
         
-        return context
+        
+        return render(request, 'blog/index.html', {
+            'blogs':context_list,
+            'page_obj':page_obj
+        })
+    
+       
+         
+        
+        
+            
+
+
 
 def blog_detail(request, slug, year, month, day):
     
@@ -52,12 +60,18 @@ def blog_detail(request, slug, year, month, day):
     
     post_to_recommend = [post for post in post_to_recommend if post.id != blog.id]
     
+
+    latest_blogs = [post for post in Post.objects.all() if post.id != blog.id]
+    latest_blogs = latest_blogs[:5]
+
+
     print(post_to_recommend)
     content = {
         'blog':blog,
         'comments':comments,
         'tags' : tags,
-        'recommendations' : post_to_recommend
+        'recommendations' : post_to_recommend,
+        'latest_blogs' : latest_blogs
     }#values() return list of dictionary.
 
     return render(request, 'blog/blog.html', content)    

@@ -15,3 +15,6 @@ class CommentForm(forms.Form):
     body = forms.CharField(max_length=100)
 
     
+class BlogSearch(forms.Form):
+    search_query = forms.CharField(max_length=100)
+    
