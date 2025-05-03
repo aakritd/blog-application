@@ -8,7 +8,17 @@
 <body>
     
     <h1>Blog posts</h1>
-    <hr><hr>
+    <hr>
+    <form method="get">
+        {{ search_form.as_p }}
+        <input type="submit" value="Search">
+    </form>
+    
+    <hr>
+    {% if searchstate %}
+        Found {{number_of_queries}} results.
+    {% endif %}
+    
 
 
     {% for blog in blogs %}

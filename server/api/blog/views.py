@@ -5,30 +5,61 @@ from django.core.paginator import Paginator #(FOR CBV, you dont need it)
 from django.views.generic import View
 from .forms import EmailPostForm, CommentForm, BlogSearch
 from django.core.mail import send_mail
+from django.db.models import Q
 
 class PostListView(View):
 
+    def __init__(self):
+        super().__init__()
+        self.searchquery = None
+        self.searchstate = False
+
     def get(self, request):
         
-        blogs = Post.objects.filter(status='PB').order_by('-publish')
-
+        self.searchquery = request.GET.get('search_query')
+        
+        print(self.searchquery, type(self.searchquery))
+        if self.searchquery == None:
+            self.searchstate = False
+            blogs = Post.objects.filter(status='PB').order_by('-publish')
+        else:  
+            self.searchstate = True  
+            q1 = Post.objects.filter(status='PB')
+            
+            Q1 = Q(title__icontains = self.searchquery)
+            Q2 = Q(author__username__icontains = self.searchquery)
+            Q3 = Q(tags__tag_name__icontains = self.searchquery)
+            q1 = q1.filter(Q1 | Q2 | Q3).distinct()
+            blogs = q1.order_by('-publish')
+            
+        
+        number_of_queries = blogs.count()
         paginator = Paginator(blogs, 3)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
 
-
         context_list = []
+        search_form = BlogSearch()
+  
         for blog in page_obj:
             temp_dict = {}
             temp_dict['blog'] = blog
             temp_dict['tag'] = blog.tags.values('tag_name')
             context_list.append(temp_dict)
-        
-        
+            
         return render(request, 'blog/index.html', {
             'blogs':context_list,
-            'page_obj':page_obj
+            'page_obj':page_obj,
+            'search_form':search_form,
+            'number_of_queries':number_of_queries,
+            'searchstate':self.searchstate
         })
+    
+    def post(self, request):
+        
+        print('search form requested')
+        return self.get(request)
+        
     
        
          
